@@ -1,0 +1,43 @@
+version: '3.8' 
+ 
+services: 
+  Rabbito: 
+    image: rabbitmq:management
+    hostname: "rabbitmq-dev"
+    ports: 
+      - "15672:15672"
+      - "5672:5672" 
+    networks: 
+      - network1
+
+  planning: 
+    image: williamkruse/taxaplanning:latest 
+    environment: 
+      - CSVPath=//srv/images/test.csv
+      - RMQHN=rabbitmq-dev
+    restart: unless-stopped
+    ports:
+          - "5001:80" 
+    networks: 
+      - network1
+    volumes: 
+      - images:/srv/images
+ 
+  booking: 
+    image: williamkruse/taxabooking:latest 
+    environment: 
+      - CSVPath=//srv/images/test.csv
+      - RMQHN=rabbitmq-dev
+    ports: 
+      - "5002:80" 
+    networks: 
+      - network1
+    volumes: 
+      - images:/srv/images 
+ 
+volumes: 
+  images: 
+    external: false 
+ 
+networks: 
+  network1:
