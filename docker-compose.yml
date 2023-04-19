@@ -1,20 +1,20 @@
 version: '3.8' 
  
-services: 
-  Rabbito: 
+services:
+  Rabbito:
     image: rabbitmq:management
     hostname: "rabbitmq-dev"
     ports: 
       - "15672:15672"
-      - "5672:5672" 
-    networks: 
+      - "5672:5672"
+    networks:
       - network1
 
   planning: 
     image: williamkruse/taxaplanning:latest 
     environment: 
       - CSVPath=//srv/images/test.csv
-      - RMQHN=rabbitmq-dev
+      - RHQHN=rabbitmq-dev
     restart: unless-stopped
     ports:
           - "5001:80" 
@@ -27,16 +27,33 @@ services:
     image: williamkruse/taxabooking:latest 
     environment: 
       - CSVPath=//srv/images/test.csv
-      - RMQHN=rabbitmq-dev
+      - RHQHN=rabbitmq-dev
     ports: 
       - "5002:80" 
     networks: 
       - network1
     volumes: 
-      - images:/srv/images 
+      - images:/srv/images
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - network1
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+    - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - network1
  
 volumes: 
   images: 
+    external: false
+  grafana-storage: 
     external: false 
  
 networks: 
