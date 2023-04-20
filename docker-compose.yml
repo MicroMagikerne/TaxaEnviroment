@@ -14,6 +14,7 @@ services:
     image: williamkruse/taxaplanning:latest 
     environment: 
       - CSVPath=//srv/images/test.csv
+      - CSVPath2=//srv/images
       - RHQHN=rabbitmq-dev
     restart: unless-stopped
     ports:
@@ -30,6 +31,17 @@ services:
       - RHQHN=rabbitmq-dev
     ports: 
       - "5002:80" 
+    networks: 
+      - network1
+    volumes: 
+      - images:/srv/images
+  maintain: 
+    image: williamkruse/maintain:latest 
+    environment: 
+      - CSVPath=//srv/images/
+      - RHQHN=rabbitmq-dev
+    ports: 
+      - "5009:80" 
     networks: 
       - network1
     volumes: 
